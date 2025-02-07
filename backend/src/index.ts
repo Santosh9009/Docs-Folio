@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { resumeData } from './resumedata';
 
@@ -12,7 +12,7 @@ app.use(express.json());
 
 
 // API Endpoints
-app.get("/about", (req, res) => {
+app.get("/about", (req:Request, res:Response) => {
     res.json({
         name: "Santosh Pati",
         role: "Full Stack Developer",
@@ -24,7 +24,7 @@ app.get("/about", (req, res) => {
     });
 });
 
-app.get("/projects", (req, res) => {
+app.get("/projects", (req:Request, res:Response) => {
     const formattedProjects = resumeData.projects.map((project, index) => ({
         id: index + 1,
         name: project.name,
@@ -37,7 +37,7 @@ app.get("/projects", (req, res) => {
     res.json(formattedProjects);
 });
 
-app.get("/experience", (req, res) => {
+app.get("/experience", (req:Request, res:Response) => {
     const formattedExperience = resumeData.workExperience.map(exp => ({
         title: exp.role,
         company: exp.company,
@@ -49,7 +49,7 @@ app.get("/experience", (req, res) => {
     res.json(formattedExperience);
 });
 
-app.get("/skills", (req, res) => {
+app.get("/skills", (req:Request, res:Response) => {
     res.json({
         frontend: resumeData.skills.frontend,
         backend: resumeData.skills.backend,
@@ -59,7 +59,7 @@ app.get("/skills", (req, res) => {
     });
 });
 
-app.get("/contact", (req, res) => {
+app.get("/contact", (req:Request, res:Response) => {
     res.json({
         email: resumeData.contact.email,
         github: `https://${resumeData.socialProfiles.github}`,
