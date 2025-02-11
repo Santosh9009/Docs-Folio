@@ -4,26 +4,46 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, Github, Linkedin, MapPin } from "lucide-react";
 import Link from "next/link";
+import { fetchFromAPI } from "@/lib/api";
+import LoadingState from "@/components/LoadingState";
+import { resumeData } from "@/lib/resumedata";
 
 export default function Contact() {
   const [contactData, setContactData] = useState(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);  // Initialize as true
 
   useEffect(() => {
-    const fetchContactData = async () => {
-      const response = await fetch("http://localhost:5001/contact");
-      const data = await response.json();
-      setContactData(data);
+    const API_TIMEOUT = 3000; 
+
+    const fetchcontact = async () => {
+      try {
+        const data = await Promise.race([
+          fetchFromAPI("/contact"),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error()), API_TIMEOUT)
+          )
+        ]);
+        setContactData(data);
+        console.log("Contact data:", data);
+      } catch (error) {
+        setContactData({
+          email: resumeData.contact.email,
+          github: `https://${resumeData.socialProfiles.github}`,
+          linkedin: `https://${resumeData.socialProfiles.linkedin}`,
+          location: resumeData.contact.location,
+          mobile: resumeData.contact.mobile
+        });
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchContactData();
+
+    fetchcontact();
   }, []);
 
-  if (!contactData)
-    return (
-      <div className="min-h-[50vh] flex items-center justify-center">
-        <p className="text-muted-foreground">Loading...</p>
-      </div>
-    );
+  if (isLoading || !contactData) {  // Add check for contactData
+    return <LoadingState />;
+  }
 
   return (
     <div className="space-y-4 sm:space-y-6 p-3 sm:p-6 max-w-4xl mx-auto">

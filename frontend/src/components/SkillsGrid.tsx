@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { motion } from "framer-motion";
 import { fetchFromAPI } from "@/lib/api";
 import LoadingState from "./LoadingState";
+import { resumeData } from "@/lib/resumedata";
 
 interface SkillsData {
     frontend: string[];
@@ -20,12 +21,25 @@ export function SkillsGrid() {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
+        const API_TIMEOUT = 3000; // 
+
         const fetchSkills = async () => {
             try {
-                const data = await fetchFromAPI("/skills");
+                const data = await Promise.race([
+                    fetchFromAPI("/skills"),
+                    new Promise((_, reject) =>
+                        setTimeout(() => reject(new Error()), API_TIMEOUT)
+                    )
+                ]);
                 setSkillsData(data);
-            } catch (error) {
-                console.error("Error fetching skills:", error);
+            } catch {
+                setSkillsData({
+                    frontend: resumeData.skills.frontend,
+                    backend: resumeData.skills.backend,
+                    databases: resumeData.skills.databases,
+                    devops: resumeData.skills.devops,
+                    languages: resumeData.skills.languages
+                });
             } finally {
                 setIsLoading(false);
             }

@@ -25,7 +25,7 @@ export function ExperienceTimeline() {
                 const data = await fetchFromAPI("/experience");
                 setExperiences(data);
             } catch (error) {
-                console.error("Error fetching experience:", error);
+                console.log("Error fetching experience:");
             } finally {
                 setIsLoading(false);
             }

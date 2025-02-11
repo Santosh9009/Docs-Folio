@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { resumeData } from "@/lib/resumedata";
 
 interface AboutData {
   name: string;
@@ -36,16 +37,31 @@ const CONTACT_INFO = {
 };
 
 export default function About() {
-  const [aboutData, setAboutData] = useState<AboutData | null>(null);
+  const [aboutData, setAboutData] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    const API_TIMEOUT = 3000; 
+
     const fetchData = async () => {
       try {
-        const data = await fetchFromAPI("/about");
+        const data = await Promise.race([
+          fetchFromAPI("/about"),
+          new Promise((_, reject) =>
+            setTimeout(() => reject(new Error()), API_TIMEOUT)
+          )
+        ]);
         setAboutData(data);
       } catch (error) {
-        console.error("Error fetching about data:", error);
+        setAboutData({
+          name: "Santosh Pati",
+          role: "Full Stack Developer",
+          bio: resumeData.summary,
+          location: resumeData.contact.location,
+          email: resumeData.contact.email,
+          github: resumeData.socialProfiles.github,
+          linkedin: resumeData.socialProfiles.linkedin
+        });
       } finally {
         setIsLoading(false);
       }

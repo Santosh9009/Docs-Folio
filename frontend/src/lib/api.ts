@@ -1,12 +1,13 @@
+const API = process.env.NEXT_PUBLIC_API_URL;
 export async function fetchFromAPI(endpoint: string) {
     try {
-        const response = await fetch(`http://localhost:5001${endpoint}`);
+        const response = await fetch(`${API+endpoint}`);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            console.log('Network response was not ok');
         }
         return await response.json();
     } catch (error) {
-        console.error('Error fetching data:', error);
+        console.log('Error fetching data:');
         throw error;
     }
 } 
